@@ -1,0 +1,37 @@
+# Dependencies
+vendor/
+
+# Build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+server
+
+# Test files
+*_test.go
+*.test
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment files (secrets)
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Misc
+.DS_Store
+Thumbs.db

@@ -1,0 +1,7 @@
+ALTER TABLE staff DROP CONSTRAINT IF EXISTS chk_staff_role;
+DROP INDEX IF EXISTS idx_staff_is_active;
+DROP INDEX IF EXISTS idx_staff_role;
+ALTER TABLE staff DROP COLUMN IF EXISTS deactivated_by;
+ALTER TABLE staff DROP COLUMN IF EXISTS deactivated_at;
+ALTER TABLE staff DROP COLUMN IF EXISTS is_active;
+ALTER TABLE staff DROP COLUMN IF EXISTS role;

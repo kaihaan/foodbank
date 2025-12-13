@@ -1,0 +1,38 @@
+# Fly.io configuration for Foodbank Frontend
+# Deploy with: fly deploy --config frontend/fly.toml
+
+app = "foodbank-web"
+primary_region = "lhr"  # London - closest to Finchley
+
+[build]
+  dockerfile = "Dockerfile.fly"
+
+  [build.args]
+    VITE_AUTH0_DOMAIN = ""
+    VITE_AUTH0_CLIENT_ID = ""
+    VITE_AUTH0_AUDIENCE = ""
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+[[http_service.checks]]
+  grace_period = "5s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/"
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1

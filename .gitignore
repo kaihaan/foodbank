@@ -1,0 +1,41 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Go
+backend/tmp/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Database
+*.sql.bak
+
+# Docker volumes (if stored locally)
+postgres-data/

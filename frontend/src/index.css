@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  min-height: 100vh;
+}
+
+/* Print styles for barcode labels */
+@media print {
+  /* Hide navigation and non-essential elements */
+  nav,
+  .navbar {
+    display: none !important;
+  }
+
+  /* Reset page styles for clean printing */
+  body {
+    min-height: auto;
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove background gradients */
+  .bg-gradient-to-br {
+    background: white !important;
+  }
+
+  /* Remove container padding */
+  .container {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Center the barcode label */
+  .barcode-label {
+    margin: 0 auto;
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    padding: 8mm !important;
+    width: 62mm;
+    box-sizing: border-box;
+  }
+
+  /* Ensure barcode renders correctly */
+  .barcode-svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Page setup for label printing */
+  @page {
+    size: 62mm 29mm;
+    margin: 0;
+  }
+}

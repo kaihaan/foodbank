@@ -1,0 +1,1 @@
+1. move project files from windows folder into Linux folders (speed / file paths)
