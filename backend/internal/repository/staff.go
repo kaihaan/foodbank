@@ -27,7 +27,8 @@ func scanStaff(row pgx.Row) (*model.Staff, error) {
 	var s model.Staff
 	err := row.Scan(
 		&s.ID, &s.Auth0ID, &s.Name, &s.Email, &s.Mobile,
-		&s.Address, &s.Theme, &s.Role, &s.IsActive,
+		&s.Address, &s.Theme, &s.BackgroundImage, &s.Role, &s.IsActive,
+		&s.EmailVerified, &s.EmailVerifiedAt,
 		&s.CreatedAt, &s.CreatedBy, &s.DeactivatedAt, &s.DeactivatedBy,
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -46,7 +47,8 @@ func scanStaffRows(rows pgx.Rows) ([]model.Staff, error) {
 		var s model.Staff
 		err := rows.Scan(
 			&s.ID, &s.Auth0ID, &s.Name, &s.Email, &s.Mobile,
-			&s.Address, &s.Theme, &s.Role, &s.IsActive,
+			&s.Address, &s.Theme, &s.BackgroundImage, &s.Role, &s.IsActive,
+			&s.EmailVerified, &s.EmailVerifiedAt,
 			&s.CreatedAt, &s.CreatedBy, &s.DeactivatedAt, &s.DeactivatedBy,
 		)
 		if err != nil {
@@ -57,7 +59,7 @@ func scanStaffRows(rows pgx.Rows) ([]model.Staff, error) {
 	return staff, rows.Err()
 }
 
-const staffSelectColumns = `id, auth0_id, name, email, mobile, address, theme, role, is_active, created_at, created_by, deactivated_at, deactivated_by`
+const staffSelectColumns = `id, auth0_id, name, email, mobile, address, theme, background_image, role, is_active, email_verified, email_verified_at, created_at, created_by, deactivated_at, deactivated_by`
 
 func (r *StaffRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Staff, error) {
 	query := `SELECT ` + staffSelectColumns + ` FROM staff WHERE id = $1`
@@ -94,14 +96,14 @@ func (r *StaffRepository) CreateWithRole(ctx context.Context, auth0ID, name, ema
 	return scanStaff(r.db.QueryRow(ctx, query, auth0ID, name, email, role, mobile, address, createdBy))
 }
 
-func (r *StaffRepository) Update(ctx context.Context, id uuid.UUID, name, email string, mobile, address *string, theme string) (*model.Staff, error) {
+func (r *StaffRepository) Update(ctx context.Context, id uuid.UUID, name, email string, mobile, address *string, theme, backgroundImage string) (*model.Staff, error) {
 	query := `
 		UPDATE staff
-		SET name = $2, email = $3, mobile = $4, address = $5, theme = $6
+		SET name = $2, email = $3, mobile = $4, address = $5, theme = $6, background_image = $7
 		WHERE id = $1
 		RETURNING ` + staffSelectColumns
 
-	return scanStaff(r.db.QueryRow(ctx, query, id, name, email, mobile, address, theme))
+	return scanStaff(r.db.QueryRow(ctx, query, id, name, email, mobile, address, theme, backgroundImage))
 }
 
 // UpdateRole updates a staff member's role
@@ -181,4 +183,51 @@ func (r *StaffRepository) CountAdmins(ctx context.Context) (int, error) {
 	var count int
 	err := r.db.QueryRow(ctx, query).Scan(&count)
 	return count, err
+}
+
+// ListAdminEmails returns email addresses of all active admin users
+func (r *StaffRepository) ListAdminEmails(ctx context.Context) ([]string, error) {
+	query := `SELECT email FROM staff WHERE role = 'admin' AND is_active = true`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var emails []string
+	for rows.Next() {
+		var email string
+		if err := rows.Scan(&email); err != nil {
+			return nil, err
+		}
+		emails = append(emails, email)
+	}
+	return emails, rows.Err()
+}
+
+// SetEmailVerified marks a staff member's email as verified
+func (r *StaffRepository) SetEmailVerified(ctx context.Context, id uuid.UUID) error {
+	query := `UPDATE staff SET email_verified = true, email_verified_at = NOW() WHERE id = $1`
+	result, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrStaffNotFound
+	}
+	return nil
+}
+
+// ClearEmailVerified clears a staff member's email verification status
+func (r *StaffRepository) ClearEmailVerified(ctx context.Context, id uuid.UUID) error {
+	query := `UPDATE staff SET email_verified = false, email_verified_at = NULL WHERE id = $1`
+	result, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return ErrStaffNotFound
+	}
+	return nil
 }

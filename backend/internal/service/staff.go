@@ -56,7 +56,7 @@ func (s *StaffService) FindOrCreate(ctx context.Context, auth0ID, name, email st
 		}
 
 		if needsUpdate {
-			staff, err = s.repo.Update(ctx, staff.ID, updatedName, updatedEmail, staff.Mobile, staff.Address, staff.Theme)
+			staff, err = s.repo.Update(ctx, staff.ID, updatedName, updatedEmail, staff.Mobile, staff.Address, staff.Theme, staff.BackgroundImage)
 			if err != nil {
 				return nil, false, err
 			}
@@ -84,8 +84,30 @@ func (s *StaffService) GetByAuth0ID(ctx context.Context, auth0ID string) (*model
 	return s.repo.GetByAuth0ID(ctx, auth0ID)
 }
 
-func (s *StaffService) Update(ctx context.Context, id uuid.UUID, name, email string, mobile, address *string, theme string) (*model.Staff, error) {
-	return s.repo.Update(ctx, id, name, email, mobile, address, theme)
+func (s *StaffService) Update(ctx context.Context, id uuid.UUID, name, email string, mobile, address *string, theme, backgroundImage string) (*model.Staff, error) {
+	// Check if email is changing
+	existing, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the staff member
+	staff, err := s.repo.Update(ctx, id, name, email, mobile, address, theme, backgroundImage)
+	if err != nil {
+		return nil, err
+	}
+
+	// If email changed, clear verification status
+	if existing.Email != email {
+		if err := s.repo.ClearEmailVerified(ctx, id); err != nil {
+			// Log but don't fail the update
+			// The staff record is already updated
+		}
+		// Refresh to get updated verification status
+		staff, _ = s.repo.GetByID(ctx, id)
+	}
+
+	return staff, nil
 }
 
 func (s *StaffService) List(ctx context.Context) ([]model.Staff, error) {

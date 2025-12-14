@@ -33,34 +33,32 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]string{"error": message})
 }
 
-// Me returns the current user's staff profile, creating it if it doesn't exist.
+// Me returns the current user's staff profile.
+// Returns 403 if the user is authenticated but not registered in the system.
 func (h *StaffHandler) Me(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	auth0ID := middleware.GetAuth0ID(ctx)
-	email := middleware.GetAuth0Email(ctx)
-	name := middleware.GetAuth0Name(ctx)
 
 	if auth0ID == "" {
 		writeError(w, http.StatusUnauthorized, "unauthorized")
 		return
 	}
 
-	// Use email as name fallback
-	if name == "" {
-		name = email
-	}
-
-	staff, created, err := h.staffService.FindOrCreate(ctx, auth0ID, name, email)
+	// Look up the staff member by Auth0 ID
+	staff, err := h.staffService.GetByAuth0ID(ctx, auth0ID)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "internal server error")
+		// User is authenticated but not registered in our system
+		writeError(w, http.StatusForbidden, "not_registered")
 		return
 	}
 
-	if created {
-		writeJSON(w, http.StatusCreated, staff)
-	} else {
-		writeJSON(w, http.StatusOK, staff)
+	// Check if the account is active
+	if !staff.IsActive {
+		writeError(w, http.StatusForbidden, "account_inactive")
+		return
 	}
+
+	writeJSON(w, http.StatusOK, staff)
 }
 
 // Get returns a staff member by ID.
@@ -124,7 +122,7 @@ func (h *StaffHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	staff, err := h.staffService.Update(r.Context(), id, req.Name, req.Email, req.Mobile, req.Address, req.Theme)
+	staff, err := h.staffService.Update(r.Context(), id, req.Name, req.Email, req.Mobile, req.Address, req.Theme, req.BackgroundImage)
 	if err != nil {
 		writeError(w, http.StatusNotFound, "staff not found")
 		return

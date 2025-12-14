@@ -14,6 +14,11 @@ type Config struct {
 	Auth0M2MClientID     string
 	Auth0M2MClientSecret string
 	Auth0ConnectionID    string
+	// Resend configuration
+	ResendAPIKey string
+	FromEmail      string
+	FromName       string
+	AppBaseURL     string
 }
 
 func Load() (*Config, error) {
@@ -29,6 +34,10 @@ func Load() (*Config, error) {
 		Auth0M2MClientID:     getEnv("AUTH0_M2M_CLIENT_ID", ""),
 		Auth0M2MClientSecret: getEnv("AUTH0_M2M_CLIENT_SECRET", ""),
 		Auth0ConnectionID:    getEnv("AUTH0_CONNECTION_ID", ""),
+		ResendAPIKey:         getEnv("RESEND_API_KEY", ""),
+		FromEmail:            getEnv("FROM_EMAIL", "noreply@finchley-foodbank.org"),
+		FromName:             getEnv("FROM_NAME", "Finchley Foodbank"),
+		AppBaseURL:           getEnv("APP_BASE_URL", "http://localhost:5173"),
 	}
 
 	return cfg, nil

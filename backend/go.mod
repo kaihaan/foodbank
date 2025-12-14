@@ -1,6 +1,6 @@
 module github.com/finchley-foodbank/foodbank
 
-go 1.22.0
+go 1.23
 
 require (
 	github.com/auth0/go-jwt-middleware/v2 v2.2.2
@@ -9,6 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/joho/godotenv v1.5.1
+	github.com/resend/resend-go/v2 v2.28.0
 )
 
 require (

@@ -16,6 +16,7 @@ import (
 	"github.com/finchley-foodbank/foodbank/internal/auth0"
 	"github.com/finchley-foodbank/foodbank/internal/config"
 	"github.com/finchley-foodbank/foodbank/internal/database"
+	"github.com/finchley-foodbank/foodbank/internal/email"
 	"github.com/finchley-foodbank/foodbank/internal/handler"
 	"github.com/finchley-foodbank/foodbank/internal/handler/middleware"
 	"github.com/finchley-foodbank/foodbank/internal/repository"
@@ -56,6 +57,14 @@ func main() {
 		log.Println("Warning: Auth0 Management API not configured (staff invitation disabled)")
 	}
 
+	// Create email service (Resend)
+	emailService := email.NewService(cfg.ResendAPIKey, cfg.FromEmail, cfg.FromName, cfg.AppBaseURL)
+	if emailService.IsConfigured() {
+		log.Println("Email service configured")
+	} else {
+		log.Println("Warning: Email service not configured (admin notifications disabled)")
+	}
+
 	// Create router
 	r := chi.NewRouter()
 
@@ -64,7 +73,7 @@ func main() {
 	r.Use(chimiddleware.Recoverer)
 	r.Use(chimiddleware.RequestID)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000", "https://foodbank-web.fly.dev"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		ExposedHeaders:   []string{"Link"},
@@ -76,19 +85,31 @@ func main() {
 	staffRepo := repository.NewStaffRepository(db)
 	clientRepo := repository.NewClientRepository(db)
 	auditRepo := repository.NewAuditRepository(db)
+	registrationRequestRepo := repository.NewRegistrationRequestRepository(db)
+	verificationRepo := repository.NewVerificationRepository(db)
 
 	// Services
 	staffService := service.NewStaffService(staffRepo, auth0Client)
 	clientService := service.NewClientService(clientRepo, auditRepo)
+	registrationRequestService := service.NewRegistrationRequestService(registrationRequestRepo, staffRepo, auth0Client, emailService)
+	verificationService := service.NewVerificationService(verificationRepo, staffRepo, emailService)
 
 	// Handlers
 	healthHandler := handler.NewHealthHandler()
 	staffHandler := handler.NewStaffHandler(staffService)
 	clientHandler := handler.NewClientHandler(clientService, staffService)
 	auditHandler := handler.NewAuditHandler(auditRepo)
+	registrationRequestHandler := handler.NewRegistrationRequestHandler(registrationRequestService)
+	verificationHandler := handler.NewVerificationHandler(verificationService)
 
 	// Public routes
 	r.Get("/api/health", healthHandler.Health)
+
+	// Public registration request routes (no auth required)
+	r.Post("/api/registration-requests", registrationRequestHandler.Submit)
+	r.Get("/api/registration-requests/action/{token}", registrationRequestHandler.GetByToken)
+	r.Post("/api/registration-requests/action/{token}/approve", registrationRequestHandler.ApproveByToken)
+	r.Post("/api/registration-requests/action/{token}/reject", registrationRequestHandler.RejectByToken)
 
 	// Protected routes (require Auth0 JWT)
 	if cfg.Auth0Domain != "" && cfg.Auth0Audience != "" {
@@ -107,6 +128,12 @@ func main() {
 			r.Get("/api/me/mfa", staffHandler.GetMFAStatus)
 			r.Post("/api/me/mfa/enroll", staffHandler.EnrollMFA)
 			r.Delete("/api/me/mfa", staffHandler.DisableMFA)
+
+			// Email verification routes
+			r.Get("/api/verification/status", verificationHandler.GetStatus)
+			r.Post("/api/verification/send", verificationHandler.SendCode)
+			r.Post("/api/verification/verify", verificationHandler.VerifyCode)
+
 			r.Get("/api/staff", staffHandler.List)
 			r.Get("/api/staff/{id}", staffHandler.Get)
 			r.Put("/api/staff/{id}", staffHandler.Update)
@@ -118,6 +145,12 @@ func main() {
 				r.Delete("/api/staff/{id}", staffHandler.Deactivate)
 				r.Post("/api/staff/{id}/reactivate", staffHandler.Reactivate)
 				r.Put("/api/staff/{id}/role", staffHandler.UpdateRole)
+
+				// Registration request management
+				r.Get("/api/registration-requests", registrationRequestHandler.List)
+				r.Get("/api/registration-requests/count", registrationRequestHandler.CountPending)
+				r.Post("/api/registration-requests/{id}/approve", registrationRequestHandler.ApproveByID)
+				r.Post("/api/registration-requests/{id}/reject", registrationRequestHandler.RejectByID)
 			})
 
 			// Client routes
