@@ -33,6 +33,7 @@ Rule: Always use context7 when I need code generation
 ## UI Design Principles
 
 - Minimal design language with maximum negative space
+- Responsive UI for mobile and desktop 
 - Clear information hierarchy (important = center, larger, bolder)
 - No more than 3 text sizes; consistent corner radii
 - CSS animations for page loads and micro-interactions (Motion library for React)

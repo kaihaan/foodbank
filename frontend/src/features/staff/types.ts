@@ -8,12 +8,20 @@ export interface Staff {
   mobile?: string
   address?: string
   theme: string
+  background_image: string
   role: StaffRole
   is_active: boolean
+  email_verified: boolean
+  email_verified_at?: string
   created_at: string
   created_by?: string
   deactivated_at?: string
   deactivated_by?: string
+}
+
+export interface VerificationStatus {
+  email_verified: boolean
+  email_verified_at?: string
 }
 
 export interface InviteStaffRequest {
@@ -30,6 +38,7 @@ export interface UpdateStaffRequest {
   mobile?: string
   address?: string
   theme: string
+  background_image: string
 }
 
 export interface UpdateRoleRequest {

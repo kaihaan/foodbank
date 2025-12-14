@@ -6,6 +6,7 @@ import { ThemeProvider } from './hooks/useTheme'
 import { ToastProvider } from './hooks/useToast'
 import { BarcodeScannerProvider } from './hooks/useBarcodeScanner'
 import { CurrentUserProvider } from './hooks/useCurrentUser'
+import { BackgroundProvider } from './hooks/useBackground'
 import './index.css'
 import App from './App'
 
@@ -27,9 +28,11 @@ createRoot(document.getElementById('root')!).render(
         >
           <BrowserRouter>
             <CurrentUserProvider>
-              <BarcodeScannerProvider>
-                <App />
-              </BarcodeScannerProvider>
+              <BackgroundProvider>
+                <BarcodeScannerProvider>
+                  <App />
+                </BarcodeScannerProvider>
+              </BackgroundProvider>
             </CurrentUserProvider>
           </BrowserRouter>
         </Auth0Provider>

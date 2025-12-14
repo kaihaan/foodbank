@@ -47,6 +47,7 @@ export default function StaffEditPage() {
     mobile: '',
     address: '',
     theme: 'system',
+    background_image: 'none',
   })
 
   const loadStaff = useCallback(async () => {
@@ -62,6 +63,7 @@ export default function StaffEditPage() {
         mobile: data.mobile || '',
         address: data.address || '',
         theme: data.theme || 'system',
+        background_image: data.background_image || 'none',
       })
     } catch (err) {
       console.error('Failed to load staff:', err)

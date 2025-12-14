@@ -1,4 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
+import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import DashboardPage from '../dashboard/DashboardPage'
 
@@ -27,6 +28,13 @@ export default function HomePage() {
           <button className="btn btn-primary btn-lg" onClick={() => loginWithRedirect()}>
             Login to Get Started
           </button>
+          <div className="divider">OR</div>
+          <p className="text-sm text-base-content/70 mb-3">
+            New staff member?
+          </p>
+          <Link to="/register" className="btn btn-outline">
+            Request Access
+          </Link>
         </div>
       </div>
     </motion.div>

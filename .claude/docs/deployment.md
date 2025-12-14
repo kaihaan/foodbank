@@ -49,11 +49,11 @@ fly postgres attach foodbank-db --app foodbank-api
 
 # Set secrets from your .env file
 fly secrets set --app foodbank-api \
-  AUTH0_DOMAIN="your-tenant.auth0.com" \
+  AUTH0_DOMAIN="dev-qs1wwh0z3t1xklez.us.auth0.com" \
   AUTH0_AUDIENCE="https://api.foodbank.local" \
-  AUTH0_M2M_CLIENT_ID="your-m2m-client-id" \
-  AUTH0_M2M_CLIENT_SECRET="your-m2m-client-secret" \
-  AUTH0_CONNECTION_ID="con_xxxxxxxxxxxxx"
+  AUTH0_M2M_CLIENT_ID="ROeAebbz1FcvgtM1BdU7ycGI8eGso1Cb" \
+  AUTH0_M2M_CLIENT_SECRET="5xgGOp_AfLi2NubgOg3YjgbiYiB89659D1FpRXE-9TasLoBsmfIZuL1I6ho4Ulfb" \
+  AUTH0_CONNECTION_ID="con_Nyckcn2DF0XNmsA1"
 
 # Deploy
 cd backend

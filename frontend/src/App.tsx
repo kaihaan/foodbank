@@ -13,6 +13,10 @@ import StaffDetailPage from './features/staff/StaffDetailPage'
 import StaffCreatePage from './features/staff/StaffCreatePage'
 import StaffEditPage from './features/staff/StaffEditPage'
 import AuditLogPage from './features/audit/AuditLogPage'
+import RegistrationRequestPage from './features/registration/RegistrationRequestPage'
+import TokenActionPage from './features/registration/TokenActionPage'
+import PendingApprovalsPage from './features/registration/PendingApprovalsPage'
+import SettingsPage from './features/settings/SettingsPage'
 import ProtectedRoute from './features/auth/ProtectedRoute'
 
 function App() {
@@ -30,6 +34,9 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
+        {/* Public registration routes */}
+        <Route path="register" element={<RegistrationRequestPage />} />
+        <Route path="registration/action/:token" element={<TokenActionPage />} />
         <Route
           path="clients"
           element={
@@ -115,6 +122,22 @@ function App() {
           element={
             <ProtectedRoute>
               <AuditLogPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="approvals"
+          element={
+            <ProtectedRoute requireAdmin>
+              <PendingApprovalsPage />
             </ProtectedRoute>
           }
         />
