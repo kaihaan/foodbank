@@ -17,6 +17,7 @@ import RegistrationRequestPage from './features/registration/RegistrationRequest
 import TokenActionPage from './features/registration/TokenActionPage'
 import PendingApprovalsPage from './features/registration/PendingApprovalsPage'
 import SettingsPage from './features/settings/SettingsPage'
+import ImportPage from './features/import/ImportPage'
 import ProtectedRoute from './features/auth/ProtectedRoute'
 
 function App() {
@@ -138,6 +139,14 @@ function App() {
           element={
             <ProtectedRoute requireAdmin>
               <PendingApprovalsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="import"
+          element={
+            <ProtectedRoute requireAdmin>
+              <ImportPage />
             </ProtectedRoute>
           }
         />

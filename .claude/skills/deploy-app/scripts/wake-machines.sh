@@ -1,13 +1,14 @@
 #!/bin/bash
 # Wake sleeping Fly.io machines for the Foodbank application
-# Usage: ./wake-machines.sh [backend|frontend|both]
+# Usage: ./wake-machines.sh [backend|frontend|database|all]
 
 set -e
 
 BACKEND_APP="foodbank-api"
 FRONTEND_APP="foodbank-web"
+DATABASE_APP="foodbank-db"
 
-TARGET="${1:-both}"
+TARGET="${1:-all}"
 
 wake_app_machines() {
     local app_name="$1"
@@ -46,7 +47,12 @@ case "$TARGET" in
     frontend)
         wake_app_machines "$FRONTEND_APP"
         ;;
-    both|*)
+    database|db)
+        wake_app_machines "$DATABASE_APP"
+        ;;
+    all|*)
+        # Wake database first (backend depends on it)
+        wake_app_machines "$DATABASE_APP"
         wake_app_machines "$BACKEND_APP"
         wake_app_machines "$FRONTEND_APP"
         ;;

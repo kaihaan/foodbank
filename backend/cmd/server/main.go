@@ -93,6 +93,8 @@ func main() {
 	clientService := service.NewClientService(clientRepo, auditRepo)
 	registrationRequestService := service.NewRegistrationRequestService(registrationRequestRepo, staffRepo, auth0Client, emailService)
 	verificationService := service.NewVerificationService(verificationRepo, staffRepo, emailService)
+	backupService := service.NewBackupService(db)
+	importService := service.NewImportService(db, clientRepo, auditRepo)
 
 	// Handlers
 	healthHandler := handler.NewHealthHandler()
@@ -101,6 +103,8 @@ func main() {
 	auditHandler := handler.NewAuditHandler(auditRepo)
 	registrationRequestHandler := handler.NewRegistrationRequestHandler(registrationRequestService)
 	verificationHandler := handler.NewVerificationHandler(verificationService)
+	recoveryHandler := handler.NewRecoveryHandler(backupService)
+	importHandler := handler.NewImportHandler(importService)
 
 	// Public routes
 	r.Get("/api/health", healthHandler.Health)
@@ -151,6 +155,21 @@ func main() {
 				r.Get("/api/registration-requests/count", registrationRequestHandler.CountPending)
 				r.Post("/api/registration-requests/{id}/approve", registrationRequestHandler.ApproveByID)
 				r.Post("/api/registration-requests/{id}/reject", registrationRequestHandler.RejectByID)
+
+				// Backup (admin only - normal auth)
+				r.Get("/api/admin/backup", recoveryHandler.Backup)
+
+				// Import (admin only)
+				r.Get("/api/admin/import/template", importHandler.Template)
+				r.Post("/api/admin/import/validate", importHandler.Validate)
+				r.Post("/api/admin/import/clients", importHandler.Import)
+			})
+
+			// Recovery routes (recovery token OR admin)
+			r.Group(func(r chi.Router) {
+				r.Use(middleware.RecoveryAuth(cfg.RecoveryToken, staffService))
+				r.Post("/api/admin/restore", recoveryHandler.Restore)
+				r.Get("/api/admin/recovery/status", recoveryHandler.Status)
 			})
 
 			// Client routes

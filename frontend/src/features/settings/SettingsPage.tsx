@@ -7,6 +7,7 @@ import { useApi } from '../../hooks/useApi'
 import { useToast } from '../../hooks/useToast'
 import type { MFAStatus } from '../staff/types'
 import EmailVerification from '../verification/EmailVerification'
+import BackupPanel from './BackupPanel'
 
 export default function SettingsPage() {
   const { theme, setTheme, themes } = useTheme()
@@ -166,9 +167,9 @@ export default function SettingsPage() {
                         : 'hover:ring-2 hover:ring-base-content/20'
                     }`}
                   >
-                    {bg.file ? (
+                    {bg.thumbnail ? (
                       <img
-                        src={`/backgrounds/${bg.file}`}
+                        src={`/backgrounds/${bg.thumbnail}`}
                         alt={bg.name}
                         className="w-full h-full object-cover"
                       />
@@ -213,6 +214,9 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        {/* Admin Section - Backup */}
+        {currentUser?.role === 'admin' && <BackupPanel />}
       </div>
     </motion.div>
   )

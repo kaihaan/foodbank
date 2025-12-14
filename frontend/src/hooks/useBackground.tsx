@@ -5,14 +5,14 @@ import { useApi } from './useApi'
 
 // Available background options
 const BACKGROUNDS = [
-  { id: 'none', name: 'None', file: null },
-  { id: 'david-bayliss', name: 'Abstract', file: 'david-bayliss-GFX1JgiYd60-unsplash.jpg' },
-  { id: 'jonas-kakaroto', name: 'Sunset', file: 'jonas-kakaroto-5JQH9Iqnm9o-unsplash.jpg' },
-  { id: 'kenny-eliason', name: 'Food', file: 'kenny-eliason-SvhXD3kPSTY-unsplash.jpg' },
-  { id: 'pornprom', name: 'Nature', file: 'pornprom-lertwasana-0wad0iZa_Zc-unsplash.jpg' },
-  { id: 'scott-warman', name: 'Groceries', file: 'scott-warman-NpNvI4ilT4A-unsplash.jpg' },
-  { id: 'shumilov', name: 'Hands', file: 'shumilov-ludmila-j7X_hySaUa4-unsplash.jpg' },
-  { id: 'will-kennard', name: 'Vegetables', file: 'will-kennard--Dm5hKCohGU-unsplash.jpg' },
+  { id: 'none', name: 'None', file: null, thumbnail: null },
+  { id: 'david-bayliss', name: 'Abstract', file: 'david-bayliss-GFX1JgiYd60-unsplash.jpg', thumbnail: 'thumbnails/david-bayliss-GFX1JgiYd60-unsplash.webp' },
+  { id: 'jonas-kakaroto', name: 'Sunset', file: 'jonas-kakaroto-5JQH9Iqnm9o-unsplash.jpg', thumbnail: 'thumbnails/jonas-kakaroto-5JQH9Iqnm9o-unsplash.webp' },
+  { id: 'kenny-eliason', name: 'Food', file: 'kenny-eliason-SvhXD3kPSTY-unsplash.jpg', thumbnail: 'thumbnails/kenny-eliason-SvhXD3kPSTY-unsplash.webp' },
+  { id: 'pornprom', name: 'Nature', file: 'pornprom-lertwasana-0wad0iZa_Zc-unsplash.jpg', thumbnail: 'thumbnails/pornprom-lertwasana-0wad0iZa_Zc-unsplash.webp' },
+  { id: 'scott-warman', name: 'Groceries', file: 'scott-warman-NpNvI4ilT4A-unsplash.jpg', thumbnail: 'thumbnails/scott-warman-NpNvI4ilT4A-unsplash.webp' },
+  { id: 'shumilov', name: 'Hands', file: 'shumilov-ludmila-j7X_hySaUa4-unsplash.jpg', thumbnail: 'thumbnails/shumilov-ludmila-j7X_hySaUa4-unsplash.webp' },
+  { id: 'will-kennard', name: 'Vegetables', file: 'will-kennard--Dm5hKCohGU-unsplash.jpg', thumbnail: 'thumbnails/will-kennard--Dm5hKCohGU-unsplash.webp' },
 ] as const
 
 export type BackgroundId = (typeof BACKGROUNDS)[number]['id']
