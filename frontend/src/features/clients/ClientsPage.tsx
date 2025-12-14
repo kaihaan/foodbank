@@ -114,7 +114,7 @@ export default function ClientsPage() {
         <h1 className="text-3xl font-bold">Clients</h1>
         <div className="flex gap-2">
           <button
-            className="btn btn-outline"
+            className="hidden md:inline-flex btn btn-outline"
             onClick={handleExport}
             disabled={isExporting || total === 0}
           >
@@ -171,12 +171,12 @@ export default function ClientsPage() {
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Barcode</th>
+                      <th className="hidden md:table-cell">Barcode</th>
                       <th>Name</th>
-                      <th>Address</th>
-                      <th>Family</th>
-                      <th>Preferences</th>
-                      <th>Appointment</th>
+                      <th className="hidden md:table-cell">Address</th>
+                      <th className="hidden md:table-cell">Family</th>
+                      <th className="hidden md:table-cell">Preferences</th>
+                      <th className="hidden md:table-cell">Appointment</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -192,14 +192,14 @@ export default function ClientsPage() {
                     ) : (
                       clients.map((client) => (
                         <tr key={client.id} className="hover">
-                          <td>
+                          <td className="hidden md:table-cell">
                             <code className="text-xs bg-base-200 px-2 py-1 rounded">
                               {client.barcode_id}
                             </code>
                           </td>
                           <td className="font-medium">{client.name}</td>
-                          <td className="max-w-xs truncate">{client.address}</td>
-                          <td>
+                          <td className="hidden md:table-cell max-w-xs truncate">{client.address}</td>
+                          <td className="hidden md:table-cell">
                             {client.family_size}
                             {client.num_children > 0 && (
                               <span className="text-xs text-base-content/60 ml-1">
@@ -207,8 +207,8 @@ export default function ClientsPage() {
                               </span>
                             )}
                           </td>
-                          <td className="text-sm">{formatPreferences(client)}</td>
-                          <td>
+                          <td className="hidden md:table-cell text-sm">{formatPreferences(client)}</td>
+                          <td className="hidden md:table-cell">
                             {client.appointment_day ? (
                               <span>
                                 {client.appointment_day}
